@@ -1,3 +1,4 @@
+// src/screens/HomeScreen.tsx
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -7,27 +8,33 @@ import {
   StyleSheet,
   ListRenderItem,
 } from 'react-native';
+import { CompositeScreenProps } from '@react-navigation/native';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList, Service } from '../types/navigation';
-import { fetchServicesApi, getName } from '../services/api';
+import { MainTabParamList, RootStackParamList, Service } from '../types/navigation';
+import { fetchServicesApi } from '../services/api';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<MainTabParamList, 'Home'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [services, setServices] = useState<Service[]>([]);
 
+  
+
   useEffect(() => {
     const loadServices = async () => {
-      try {
-        const data = await fetchServicesApi();
-        setServices(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
+    try {
+      const data = await fetchServicesApi();
+      setServices(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
     // const unsub = navigation.addListener('focus', () => {
-    //   loadServices();
+    //   void loadServices();
     // });
     // return unsub;
     loadServices();
@@ -41,27 +48,30 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
       <Text numberOfLines={1} style={styles.serviceName}>
         {item.name}
       </Text>
-      <Text style={styles.price}>{item.price.toLocaleString()} đ</Text>
+      <Text style={styles.price}>
+        {item.price.toLocaleString()} đ
+      </Text>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
-        
-        <Text style={styles.userName}>{getName()} - Tran Vu Truong Huy</Text>
-        {/* <View style={styles.avatarCircle} /> */}
+        <Text style={styles.userName}>HUYỀN TRINH</Text>
+        <View style={styles.avatarCircle} />
       </View>
 
       <Text style={styles.sectionTitle}>Danh sách dịch vụ</Text>
 
       <FlatList
         data={services}
-        keyExtractor={item => item._id}
+        keyExtractor={(item) => item._id}
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 80 }}
       />
 
+      {/* Add button */}
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('AddService')}
@@ -83,12 +93,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   userName: { fontWeight: 'bold', fontSize: 18 },
-  avatarCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: pink,
-  },
+  avatarCircle: { width: 32, height: 32, borderRadius: 16, backgroundColor: pink },
   sectionTitle: { fontSize: 16, fontWeight: 'bold', marginVertical: 8 },
   card: {
     padding: 14,

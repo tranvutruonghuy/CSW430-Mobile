@@ -23,7 +23,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       await setToken(data.token); // save to AsyncStorage
       await setName(data.name);
       await setPhone(data.phone);
-      navigation.replace('Home');
+      navigation.replace('MainTabs'); // go to bottom tabs
     } catch (error) {
       console.log(error);
       Alert.alert('Login failed', 'Phone or password is incorrect');

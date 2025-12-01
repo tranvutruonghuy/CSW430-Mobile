@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Service } from '../types/navigation';
 
-export const API_BASE_URL = 'https://kami-backend-5rs0.onrender.com'; // note the "-"
+export const API_BASE_URL = 'https://kami-backend-5rs0.onrender.com';
 
 const TOKEN_KEY = 'authToken';
 const NAME_KEY = 'name';
@@ -39,7 +39,9 @@ export const clearToken = async () => {
 
 // ---------- API calls ----------
 
-// 1. LOGIN
+// ------------- AUTH -------------
+
+// 1. LOGIN: POST /auth  { phone, password } -> { token }
 export const loginApi = async (
   phone: string,
   password: string,
@@ -51,58 +53,99 @@ export const loginApi = async (
   return res.data;
 };
 
-// 2. GET ALL SERVICES
+// Helper to include Authorization header when token exists
+const authHeader = async () => {
+  const token = await getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+// ------------- SERVICES CRUD -------------
+
+// 2. GET all services
 export const fetchServicesApi = async (): Promise<Service[]> => {
-  const token = await getToken();
+  const headers = await authHeader();
   const res = await axios.get<Service[]>(`${API_BASE_URL}/services`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    headers,
   });
   return res.data;
 };
 
-// 3. GET ONE SERVICE
+// 3. GET a service by id
 export const fetchServiceApi = async (id: string): Promise<Service> => {
-  const token = await getToken();
+  const headers = await authHeader();
   const res = await axios.get<Service>(`${API_BASE_URL}/services/${id}`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    headers,
   });
   return res.data;
 };
 
-// 4. ADD SERVICE
+// 4. ADD service
 export const addServiceApi = async (
   name: string,
   price: number,
 ): Promise<void> => {
-  const token = await getToken();
-  const res = await axios.post(
+  const headers = await authHeader();
+  await axios.post(
     `${API_BASE_URL}/services`,
-    { name, price }, // if backend wants token in body: add token here
-    { headers: token ? { Authorization: `Bearer ${token}` } : undefined },
+    { name, price }, // if backend requires token in body, add it here
+    { headers },
   );
-  return res.data;
 };
 
-// 5. UPDATE SERVICE
+// 5. UPDATE service
 export const updateServiceApi = async (
   id: string,
   name: string,
   price: number,
 ): Promise<void> => {
-  const token = await getToken();
-  const res = await axios.put(
+  const headers = await authHeader();
+  await axios.put(
     `${API_BASE_URL}/services/${id}`,
     { name, price },
-    { headers: token ? { Authorization: `Bearer ${token}` } : undefined },
+    { headers },
   );
+};
+
+// 6. DELETE service
+export const deleteServiceApi = async (id: string): Promise<void> => {
+  const headers = await authHeader();
+  await axios.delete(`${API_BASE_URL}/services/${id}`, { headers });
+};
+
+// ------------- CUSTOMERS -------------
+
+// GET all customers
+export const fetchCustomersApi = async (): Promise<any[]> => {
+  const headers = await authHeader();
+  const res = await axios.get<any[]>(`${API_BASE_URL}/customers`, { headers });
   return res.data;
 };
 
-// 6. DELETE SERVICE
-export const deleteServiceApi = async (id: string): Promise<void> => {
-  const token = await getToken();
-  const res = await axios.delete(`${API_BASE_URL}/services/${id}`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+// ADD customer: { name, phone, token }
+export const addCustomerApi = async (
+  name: string,
+  phone: string,
+): Promise<void> => {
+  const headers = await authHeader();
+  await axios.post(`${API_BASE_URL}/customers`, { name, phone }, { headers });
+};
+
+// ------------- TRANSACTIONS -------------
+
+// GET all transactions
+export const fetchTransactionsApi = async (): Promise<any[]> => {
+  const headers = await authHeader();
+  const res = await axios.get<any[]>(`${API_BASE_URL}/transactions`, {
+    headers,
+  });
+  return res.data;
+};
+
+// GET a transaction by _id
+export const fetchTransactionApi = async (id: string): Promise<any> => {
+  const headers = await authHeader();
+  const res = await axios.get<any>(`${API_BASE_URL}/transactions/${id}`, {
+    headers,
   });
   return res.data;
 };
