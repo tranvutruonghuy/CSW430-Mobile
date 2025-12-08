@@ -40,6 +40,11 @@ export const clearToken = async () => {
 // ---------- API calls ----------
 
 // ------------- AUTH -------------
+// Helper to include Authorization header when token exists
+const authHeader = async () => {
+  const token = await getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
 // 1. LOGIN: POST /auth  { phone, password } -> { token }
 export const loginApi = async (
@@ -51,12 +56,6 @@ export const loginApi = async (
     password,
   });
   return res.data;
-};
-
-// Helper to include Authorization header when token exists
-const authHeader = async () => {
-  const token = await getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 // ------------- SERVICES CRUD -------------
@@ -121,6 +120,14 @@ export const fetchCustomersApi = async (): Promise<any[]> => {
   return res.data;
 };
 
+export const fetchCustomerApi = async (id: string): Promise<any> => {
+  const headers = await authHeader();
+  const res = await axios.get<any>(`${API_BASE_URL}/customers/${id}`, {
+    headers,
+  });
+  return res.data;
+};
+
 // ADD customer: { name, phone, token }
 export const addCustomerApi = async (
   name: string,
@@ -128,6 +135,24 @@ export const addCustomerApi = async (
 ): Promise<void> => {
   const headers = await authHeader();
   await axios.post(`${API_BASE_URL}/customers`, { name, phone }, { headers });
+};
+
+export const updateCustomerApi = async (
+  id: string,
+  name: string,
+  phone: string,
+): Promise<void> => {
+  const headers = await authHeader();
+  await axios.put(
+    `${API_BASE_URL}/customers/${id}`,
+    { name, phone },
+    { headers },
+  );
+};
+
+export const deleteCustomerApi = async (id: string): Promise<void> => {
+  const headers = await authHeader();
+  await axios.delete(`${API_BASE_URL}/customers/${id}`, { headers });
 };
 
 // ------------- TRANSACTIONS -------------
@@ -148,4 +173,29 @@ export const fetchTransactionApi = async (id: string): Promise<any> => {
     headers,
   });
   return res.data;
+};
+
+interface TransactionServiceInput {
+  _id: string;
+  quantity: number;
+  userID?: string;
+}
+
+export const addTransactionApi = async (
+  customerId: string,
+  services: TransactionServiceInput[],
+): Promise<void> => {
+  const headers = await authHeader();
+
+  const payload = {
+    customerId: customerId,
+    services: services,
+  };
+
+  await axios.post(`${API_BASE_URL}/transactions`, payload, { headers });
+};
+
+export const deleteTransactionApi = async (id: string): Promise<void> => {
+  const headers = await authHeader();
+  await axios.delete(`${API_BASE_URL}/transactions/${id}`, { headers });
 };

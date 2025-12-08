@@ -26,7 +26,6 @@ interface TransactionItem {
   customerName?: string;
   status?: string;
   totalMoney?: number;
-  // you can add more fields based on your real API
 }
 
 const TransactionListScreen: React.FC<Props> = ({ navigation }) => {
@@ -55,7 +54,8 @@ const TransactionListScreen: React.FC<Props> = ({ navigation }) => {
     >
       <View style={{ flex: 1 }}>
         <Text style={styles.bold}>
-          {item.code ?? item._id} {item.createdAt ? `- ${item.createdAt}` : ''}
+          {item.code ?? item._id}
+          {item.createdAt ? ` - ${item.createdAt}` : ''}
         </Text>
         <Text>Customer: {item.customerName ?? ''}</Text>
         {item.status && <Text style={styles.status}>{item.status}</Text>}
@@ -68,7 +68,6 @@ const TransactionListScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text>Tran Vu Truong Huy</Text>
       <FlatList
         data={transactions}
         keyExtractor={item => item._id}
@@ -76,12 +75,9 @@ const TransactionListScreen: React.FC<Props> = ({ navigation }) => {
         contentContainerStyle={{ padding: 16, paddingBottom: 80 }}
       />
 
-      {/* Add button (future: create transaction screen) */}
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => {
-          // TODO: navigate to "AddTransaction" screen if you implement later
-        }}
+        onPress={() => navigation.navigate('AddTransaction')}
       >
         <Text style={styles.addButtonText}>＋</Text>
       </TouchableOpacity>

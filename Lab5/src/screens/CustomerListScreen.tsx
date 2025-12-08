@@ -19,21 +19,21 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-interface Customer {
+interface CustomerItem {
   _id?: string;
   name: string;
   phone: string;
   totalMoney?: number;
-  type?: string; // Guest / Member
+  type?: string;
 }
 
 const CustomerListScreen: React.FC<Props> = ({ navigation }) => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers, setCustomers] = useState<CustomerItem[]>([]);
 
   const loadCustomers = async () => {
     try {
       const data = await fetchCustomersApi();
-      setCustomers(data as Customer[]);
+      setCustomers(data as CustomerItem[]);
     } catch (error) {
       console.log(error);
     }
@@ -46,8 +46,13 @@ const CustomerListScreen: React.FC<Props> = ({ navigation }) => {
     return unsub;
   }, [navigation]);
 
-  const renderItem: ListRenderItem<Customer> = ({ item }) => (
-    <View style={styles.card}>
+  const renderItem: ListRenderItem<CustomerItem> = ({ item }) => (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() =>
+        item._id && navigation.navigate('CustomerDetail', { id: item._id })
+      }
+    >
       <View>
         <Text style={styles.bold}>
           Customer: <Text style={styles.normal}>{item.name}</Text>
@@ -64,12 +69,11 @@ const CustomerListScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={styles.crown}>👑</Text>
         <Text style={styles.typeText}>{item.type ?? 'Guest'}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.bold}>Tran Vu Truong Huy</Text>
       <FlatList
         data={customers}
         keyExtractor={(item, index) => item._id ?? index.toString()}

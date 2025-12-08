@@ -1,6 +1,12 @@
 // src/screens/TransactionDetailScreen.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { fetchTransactionApi } from '../services/api';
@@ -25,7 +31,7 @@ interface TransactionDetail {
   services?: ServiceLine[];
 }
 
-const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
+const TransactionDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const { id } = route.params;
   const [transaction, setTransaction] = useState<TransactionDetail | null>(
     null,
@@ -44,22 +50,30 @@ const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     void loadDetail();
   }, [id]);
 
-  if (!transaction) {
-    return null;
-  }
+  if (!transaction) return null;
 
   const services = transaction.services ?? [];
   const amount = transaction.amount ?? 0;
   const discount = transaction.discount ?? 0;
-  const totalPayment = transaction.totalPayment ?? amount + discount;
+  const totalPayment = transaction.totalPayment ?? amount - discount;
 
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={{ padding: 16 }}
     >
+      {/* Simple menu in the top-right */}
+      <View style={styles.menuRow}>
+        <View style={{ flex: 1 }} />
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => navigation.navigate('DeleteTransaction', { id })}
+        >
+          <Text style={styles.menuText}>⋮</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* General information */}
-      <Text style={[styles.sectionTitle]}>Tran Vu Truong Huy</Text>
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: '#ff5a7a' }]}>
           General information
@@ -114,7 +128,6 @@ const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
           <Text>Discount</Text>
           <Text>{discount.toLocaleString()} đ</Text>
         </View>
-
         <View style={styles.totalRow}>
           <Text style={styles.bold}>Total payment</Text>
           <Text style={[styles.bold, { color: '#ff5a7a' }]}>
@@ -128,6 +141,9 @@ const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'white' },
+  menuRow: { flexDirection: 'row', marginBottom: 8 },
+  menuButton: { paddingHorizontal: 8, paddingVertical: 4 },
+  menuText: { fontSize: 22 },
   section: {
     backgroundColor: '#fafafa',
     borderRadius: 10,

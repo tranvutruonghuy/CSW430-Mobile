@@ -3,14 +3,25 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './src/types/navigation';
+
 import LoginScreen from './src/screens/LoginScreen';
+import MainTabs from './src/navigation/MainTabs';
+
 import AddServiceScreen from './src/screens/AddServiceScreen';
 import ServiceDetailScreen from './src/screens/ServiceDetailScreen';
 import EditServiceScreen from './src/screens/EditServiceScreen';
 import DeleteServiceScreen from './src/screens/DeleteServiceScreen';
+
 import TransactionDetailScreen from './src/screens/TransactionDetailScreen';
+import AddTransactionScreen from './src/screens/AddTransactionScreen';
+import DeleteTransactionScreen from './src/screens/DeleteTransactionScreen';
+
 import AddCustomerScreen from './src/screens/AddCustomerScreen';
-import MainTabs from './src/navigation/MainTabs';
+import CustomerDetailScreen from './src/screens/CustomerDetailScreen';
+import EditCustomerScreen from './src/screens/EditCustomerScreen';
+import DeleteCustomerScreen from './src/screens/DeleteCustomerScreen';
+import CustomerListScreen from './src/screens/CustomerListScreen';
+import TransactionListScreen from './src/screens/TransactionListScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -24,14 +35,13 @@ const App: React.FC = () => {
           options={{ headerShown: false }}
         />
 
-        {/* Bottom tabs (Home, Transaction, Customer, Setting) */}
         <Stack.Screen
           name="MainTabs"
           component={MainTabs}
           options={{ headerShown: false }}
         />
 
-        {/* Service modals / detail screens */}
+        {/* Service stack screens */}
         <Stack.Screen
           name="AddService"
           component={AddServiceScreen}
@@ -56,18 +66,59 @@ const App: React.FC = () => {
           }}
         />
 
-        {/* Transaction detail */}
+        {/* Transaction stack screens */}
+        {/* <Stack.Screen
+          name="Transaction"
+          component={TransactionListScreen}
+          options={{ title: 'Transaction list' }}
+        /> */}
         <Stack.Screen
           name="TransactionDetail"
           component={TransactionDetailScreen}
           options={{ title: 'Transaction detail' }}
         />
+        <Stack.Screen
+          name="AddTransaction"
+          component={AddTransactionScreen}
+          options={{ title: 'Add transaction' }}
+        />
+        <Stack.Screen
+          name="DeleteTransaction"
+          component={DeleteTransactionScreen}
+          options={{
+            presentation: 'transparentModal',
+            headerShown: false,
+          }}
+        />
 
-        {/* Add customer */}
+        {/* Customer stack screens */}
+        {/* <Stack.Screen
+          name="Customer"
+          component={CustomerListScreen}
+          options={{ title: 'Customer list' }}
+        /> */}
         <Stack.Screen
           name="AddCustomer"
           component={AddCustomerScreen}
           options={{ title: 'Add customer' }}
+        />
+        <Stack.Screen
+          name="CustomerDetail"
+          component={CustomerDetailScreen}
+          options={{ title: 'Customer detail' }}
+        />
+        <Stack.Screen
+          name="EditCustomer"
+          component={EditCustomerScreen}
+          options={{ title: 'Edit customer' }}
+        />
+        <Stack.Screen
+          name="DeleteCustomer"
+          component={DeleteCustomerScreen}
+          options={{
+            presentation: 'transparentModal',
+            headerShown: false,
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>
